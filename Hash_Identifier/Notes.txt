@@ -1,0 +1,46 @@
+Architecture in a nutshell: Three files do three separate jobs — patterns.py is pure data, identifier.py is pure logic (takes a string, returns a dict), and display.py handles all terminal rendering with rich. The CLI at hash_id.py just glues them together.
+Key design choices:
+
+Prefix patterns run first since $2b$, $argon2id$, {SSHA} etc. are unambiguous — they always give high confidence.
+Hex-by-length runs second and only on strings that are entirely [0-9a-fA-F] — avoids false positives.
+Shape patterns (NetNTLMv1/v2, MySQL5, DES crypt) use full regex on the whole string.
+Non-hash detection (JWT, base64) runs before everything and short-circuits — you want to tell the user "you pasted a JWT" rather than guessing it's a hash.
+The --json flag makes it scriptable: you can pipe the output to jq and integrate it into other tools.
+
+
+
+My final folder structure will look like this
+
+
+Hash_Identifier/
+├── hash_id/
+│   ├── __init__.py
+│   ├── patterns.py      # all regex/length rules
+│   ├── identifier.py    # pure identify() function
+│   └── display.py       # rich table rendering
+├── hash_id.py           # CLI entrypoint
+└── tests/
+    └── test_identifier.py
+
+
+
+Try it out with a few real examples:
+
+# bcrypt
+python hash_id.py '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LedYT7.OFcXGBSVK.'
+
+# SHA-256 hex
+python hash_id.py a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3
+
+# argon2id
+python hash_id.py '$argon2id$v=19$m=65536,t=2,p=1$c29tZXNhbHQ$RdescudvJCsgt3ub+b+dWRWJTmaaJObG'
+
+# JWT detection
+python hash_id.py 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIn0.abc123'
+
+# piped input — exit code for scripting
+echo -n "5d41402abc4b2a76b9719d911017c592" | python hash_id.py
+echo "Exit: $?"
+
+# JSON output
+python hash_id.py '$6$rounds=5000$usesomesillystri$D4IrlXatmP7rx3P3InaxLh7C' --json
