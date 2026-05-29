@@ -1,2 +1,4 @@
 # Hash_Identifier
 Identify 30+ hash formats by prefix, length, and shape — with ranked confidence and rich terminal output.
+
+A pure-Python command-line tool that identifies cryptographic hash formats without making any network requests or touching the filesystem. Feed it any string and it returns a ranked list of candidates — each with a confidence level and a one-line reason — covering prefixed formats like bcrypt, argon2id, apr1, PBKDF2, and {SSHA}; common hex hashes identified by length (MD5, SHA-1, SHA-256, SHA-512, BLAKE2, SHA-3, RIPEMD); shape-based formats like MySQL5, NetNTLMv1/v2, and 13-char DES crypt; and non-hash inputs like JWTs and raw base64 blobs. Output is rendered as a colored table via Rich, exit codes are shell-script friendly, and the identify() core is a pure function with instant runtime.
