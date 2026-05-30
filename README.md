@@ -73,7 +73,7 @@ pip install rich
 ## Installation
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/hash-id.git
+git clone https://github.com/Dickson1g1/password-manager.git
 cd hash-id
 python3 -m venv .venv && source .venv/bin/activate
 pip install rich
